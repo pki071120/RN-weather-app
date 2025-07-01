@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 const App = () => {
 	return (
@@ -7,15 +7,89 @@ const App = () => {
 			<View style={styles.cityBox}>
 				<Text style={styles.city}>city</Text>
 			</View>
-			<View style={styles.weatherBox}>
-				<View style={styles.day}>
-					<Text style={styles.date}>june</Text>
-					<Text style={styles.weather}>weather</Text>
+			<ScrollView contentContainerStyle={styles.weatherRoot} horizontal>
+				<View style={styles.weatherInner}>
+					<View style={styles.day}>
+						<Text style={styles.date}>june</Text>
+						<Text style={styles.weather}>weather</Text>
+					</View>
+					<View style={styles.tempBox}>
+						<Text style={styles.temp}>temp</Text>
+					</View>
 				</View>
-				<View style={styles.tempBox}>
-					<Text style={styles.temp}>temp</Text>
+				<View style={styles.weatherInner}>
+					<View style={styles.day}>
+						<Text style={styles.date}>june</Text>
+						<Text style={styles.weather}>weather</Text>
+					</View>
+					<View style={styles.tempBox}>
+						<Text style={styles.temp}>temp</Text>
+					</View>
 				</View>
-			</View>
+				<View style={styles.weatherInner}>
+					<View style={styles.day}>
+						<Text style={styles.date}>june</Text>
+						<Text style={styles.weather}>weather</Text>
+					</View>
+					<View style={styles.tempBox}>
+						<Text style={styles.temp}>temp</Text>
+					</View>
+				</View>
+				<View style={styles.weatherInner}>
+					<View style={styles.day}>
+						<Text style={styles.date}>june</Text>
+						<Text style={styles.weather}>weather</Text>
+					</View>
+					<View style={styles.tempBox}>
+						<Text style={styles.temp}>temp</Text>
+					</View>
+				</View>
+				<View style={styles.weatherInner}>
+					<View style={styles.day}>
+						<Text style={styles.date}>june</Text>
+						<Text style={styles.weather}>weather</Text>
+					</View>
+					<View style={styles.tempBox}>
+						<Text style={styles.temp}>temp</Text>
+					</View>
+				</View>
+				<View style={styles.weatherInner}>
+					<View style={styles.day}>
+						<Text style={styles.date}>june</Text>
+						<Text style={styles.weather}>weather</Text>
+					</View>
+					<View style={styles.tempBox}>
+						<Text style={styles.temp}>temp</Text>
+					</View>
+				</View>
+				<View style={styles.weatherInner}>
+					<View style={styles.day}>
+						<Text style={styles.date}>june</Text>
+						<Text style={styles.weather}>weather</Text>
+					</View>
+					<View style={styles.tempBox}>
+						<Text style={styles.temp}>temp</Text>
+					</View>
+				</View>
+				<View style={styles.weatherInner}>
+					<View style={styles.day}>
+						<Text style={styles.date}>june</Text>
+						<Text style={styles.weather}>weather</Text>
+					</View>
+					<View style={styles.tempBox}>
+						<Text style={styles.temp}>temp</Text>
+					</View>
+				</View>
+				<View style={styles.weatherInner}>
+					<View style={styles.day}>
+						<Text style={styles.date}>june</Text>
+						<Text style={styles.weather}>weather</Text>
+					</View>
+					<View style={styles.tempBox}>
+						<Text style={styles.temp}>temp</Text>
+					</View>
+				</View>
+			</ScrollView>
 			<StatusBar barStyle="light-content" style="light" />
 		</View>
 	);
@@ -39,7 +113,10 @@ const styles = StyleSheet.create({
 		fontWeight: "bold",
 	},
 
-	weatherBox: {
+	weatherRoot: {
+		backgroundColor: "blue",
+	},
+	weatherInner: {
 		flex: 3,
 	},
 	day: {
