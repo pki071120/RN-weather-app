@@ -9,12 +9,12 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const App = () => {
 	const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+	const [city, setCity] = useState(null);
 
 	const [permitted, setPermitted ] = useState(true);
 
 	const locationData = async () => {
-		const permission = await Location.requestForegroundPermissionsAsync();
-		console.log(permission)
+		const permission = await Location.requestForegroundPermissionsAsync();     
 
 		if (!permission.granted) {
 			setPermitted(false);
@@ -22,6 +22,11 @@ const App = () => {
 			return;
 		}
 
+		const {coords:{latitude, longitude}} = await Location.getCurrentPositionAsync({accuracy: 5});
+		const address = await Location.reverseGeocodeAsync({latitude, longitude},{useGoogleMaps: false});
+		console.log(address[0].region);
+		const cityName = address[0].city || address[0].region || address[0].district
+		setCity(cityName);
 	}
   useEffect(() => {
     locationData();
@@ -29,7 +34,7 @@ const App = () => {
 	return (
 		<View style={styles.container}>
 			<View style={styles.cityBox}>
-				<Text style={styles.city}>city</Text>
+				<Text style={styles.city}>{city? city:"불러오는중"}</Text>
 			</View>
 			<View style={styles.dateBox}>
 				<Text style={styles.date}>june</Text>
