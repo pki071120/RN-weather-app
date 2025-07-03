@@ -1,40 +1,58 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
+import { API_KEY } from "@env";
 
 import * as Location from "expo-location";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
+// https://www.googleapis.com/geolocation/v1/geolocate?key=
 const App = () => {
 	const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
+	const [errorMsg, setErrorMsg] = useState(null);
 	const [city, setCity] = useState(null);
 
-	const [permitted, setPermitted ] = useState(true);
+	const [permitted, setPermitted] = useState(true);
 
 	const locationData = async () => {
-		const permission = await Location.requestForegroundPermissionsAsync();     
+		const { granted } = await Location.requestForegroundPermissionsAsync();
 
-		if (!permission.granted) {
+		if (!granted) {
 			setPermitted(false);
 			setErrorMsg("위치에 대한 권한 부여가 거부되었습니다");
 			return;
 		}
 
-		const {coords:{latitude, longitude}} = await Location.getCurrentPositionAsync({accuracy: 5});
-		const address = await Location.reverseGeocodeAsync({latitude, longitude},{useGoogleMaps: false});
-		console.log(address[0].region);
-		const cityName = address[0].city || address[0].region || address[0].district
+		const {
+			coords: { latitude, longitude },
+		} = await Location.getCurrentPositionAsync({ accuracy: 5 });
+
+		// const address = await Location.reverseGeocodeAsync(
+		// 	{ latitude, longitude },
+		// 	{ useGoogleMaps: false }
+		// );
+		// console.log(address[0].region);
+		// const cityName =
+		// 	address[0].city || address[0].region || address[0].district;
+		// setCity(cityName);
+
+		const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${API_KEY}`;
+
+		const res = await fetch(apiUrl);
+		const data = await res.json();
+		console.log(data.results[7].formatted_address);
+		const cityName = data.results[7].formatted_address;
 		setCity(cityName);
-	}
-  useEffect(() => {
-    locationData();
-  }, []);
+	};
+
+	useEffect(() => {
+		locationData();
+	}, []);
 	return (
 		<View style={styles.container}>
 			<View style={styles.cityBox}>
-				<Text style={styles.city}>{city? city:"불러오는중"}</Text>
+				<Text style={styles.city}>{city}</Text>
 			</View>
 			<View style={styles.dateBox}>
 				<Text style={styles.date}>june</Text>
