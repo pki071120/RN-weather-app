@@ -4,6 +4,7 @@ import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
 import { API_KEY } from "@env";
 
 import * as Location from "expo-location";
+import axios from "axios";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -39,10 +40,9 @@ const App = () => {
 
 		const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${API_KEY}`;
 
-		const res = await fetch(apiUrl);
-		const data = await res.json();
-		console.log(data.results[7].formatted_address);
-		const cityName = data.results[7].formatted_address;
+		const res = await axios.get(apiUrl);
+		// console.log(res.data.results[5].address_components[0].long_name);
+		const cityName = res.data.results[5].address_components[0].long_name;
 		setCity(cityName);
 	};
 
