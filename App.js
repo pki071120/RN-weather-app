@@ -9,6 +9,7 @@ import {
 	ActivityIndicator,
 } from "react-native";
 import { WEATHER_API_KEY, LOCATION_API_KEY } from "@env";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 import * as Location from "expo-location";
 import axios from "axios";
@@ -80,7 +81,51 @@ const App = () => {
 					weather.map((day, index) => (
 						<View key={index} style={styles.weatherInner}>
 							<View style={styles.day}>
-								<Text style={styles.weather}>{day.weather[0].description}</Text>
+								<Text style={styles.weather}>
+									{day.weather[0].description}{" "}
+									{day.weather[0].id > 800 && day.weather[0].id < 805 && (
+										<MaterialCommunityIcons
+											name="weather-cloudy"
+											size={24}
+											color="black"
+										/>
+									)}
+									{day.weather[0].id === 800 && (
+										<MaterialCommunityIcons
+											name="weather-sunny"
+											size={24}
+											color="black"
+										/>
+									)}
+									{day.weather[0].id > 700 && day.weather[0].id < 800 && (
+										<MaterialCommunityIcons
+											name="weather-cloudy"
+											size={24}
+											color="black"
+										/>
+									)}
+									{day.weather[0].id >= 600 && day.weather[0].id < 700 && (
+										<MaterialCommunityIcons
+											name="weather-snowy"
+											size={24}
+											color="black"
+										/>
+									)}
+									{day.weather[0].id >= 300 && day.weather[0].id < 600 && (
+										<MaterialCommunityIcons
+											name="weather-rainy"
+											size={24}
+											color="black"
+										/>
+									)}
+									{day.weather[0].id >= 200 && day.weather[0].id < 300 && (
+										<MaterialCommunityIcons
+											name="weather-thunderstorm"
+											size={24}
+											color="black"
+										/>
+									)}
+								</Text>
 							</View>
 							<View style={styles.tempBox}>
 								<Text style={styles.temp}>{Math.round(day.temp.day)}°</Text>
