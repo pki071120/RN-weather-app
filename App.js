@@ -1,7 +1,14 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
-import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
-import { API_KEY } from "@env";
+import {
+	Dimensions,
+	ScrollView,
+	StyleSheet,
+	Text,
+	View,
+	ActivityIndicator,
+} from "react-native";
+import { WEATHER_API_KEY, LOCATION_API_KEY } from "@env";
 
 import * as Location from "expo-location";
 import axios from "axios";
@@ -12,7 +19,9 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const App = () => {
 	const [location, setLocation] = useState(null);
 	const [errorMsg, setErrorMsg] = useState(null);
+
 	const [city, setCity] = useState(null);
+	const [weather, setWeather] = useState([]);
 
 	const [permitted, setPermitted] = useState(true);
 
@@ -38,12 +47,16 @@ const App = () => {
 		// 	address[0].city || address[0].region || address[0].district;
 		// setCity(cityName);
 
-		const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${API_KEY}`;
-
-		const res = await axios.get(apiUrl);
-		// console.log(res.data.results[5].address_components[0].long_name);
-		const cityName = res.data.results[5].address_components[0].long_name;
+		const locationApiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${LOCATION_API_KEY}`;
+		const locationRes = await axios.get(locationApiUrl);
+		const cityName =
+			locationRes.data.results[5].address_components[0].long_name;
 		setCity(cityName);
+
+		const weatherApiUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&exclude=alerts&appid=${WEATHER_API_KEY}&units=metric&lang=kr`;
+		const weatherRes = await axios.get(weatherApiUrl);
+		console.log(weatherRes.data.daily);
+		setWeather(weatherRes.data.daily);
 	};
 
 	useEffect(() => {
@@ -63,30 +76,22 @@ const App = () => {
 				horizontal
 				showsHorizontalScrollIndicator={false}
 			>
-				<View style={styles.weatherInner}>
-					<View style={styles.day}>
-						<Text style={styles.weather}>weather</Text>
+				{weather.length !== 0 ? (
+					weather.map((day, index) => (
+						<View key={index} style={styles.weatherInner}>
+							<View style={styles.day}>
+								<Text style={styles.weather}>{day.weather[0].description}</Text>
+							</View>
+							<View style={styles.tempBox}>
+								<Text style={styles.temp}>{Math.round(day.temp.day)}°</Text>
+							</View>
+						</View>
+					))
+				) : (
+					<View style={styles.weatherInner}>
+						<ActivityIndicator size="large" color="#0000ff" />
 					</View>
-					<View style={styles.tempBox}>
-						<Text style={styles.temp}>temp</Text>
-					</View>
-				</View>
-				<View style={styles.weatherInner}>
-					<View style={styles.day}>
-						<Text style={styles.weather}>weather</Text>
-					</View>
-					<View style={styles.tempBox}>
-						<Text style={styles.temp}>temp</Text>
-					</View>
-				</View>
-				<View style={styles.weatherInner}>
-					<View style={styles.day}>
-						<Text style={styles.weather}>weather</Text>
-					</View>
-					<View style={styles.tempBox}>
-						<Text style={styles.temp}>temp</Text>
-					</View>
-				</View>
+				)}
 			</ScrollView>
 			<StatusBar barStyle="light-content" style="light" />
 		</View>
@@ -132,7 +137,7 @@ const styles = StyleSheet.create({
 		width: SCREEN_WIDTH,
 	},
 	day: {
-		flex: 0.2,
+		flex: 0.1,
 		textAlign: "center",
 		alignItems: "center",
 	},
@@ -144,13 +149,13 @@ const styles = StyleSheet.create({
 	},
 
 	tempBox: {
-		flex: 0.3,
+		flex: 0.5,
 		textAlign: "center",
 		alignItems: "center",
 		justifyContent: "center",
 	},
 	temp: {
-		fontSize: 120,
+		fontSize: 160,
 	},
 });
 
