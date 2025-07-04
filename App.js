@@ -56,7 +56,6 @@ const App = () => {
 
 		const weatherApiUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&exclude=alerts&appid=${WEATHER_API_KEY}&units=metric&lang=kr`;
 		const weatherRes = await axios.get(weatherApiUrl);
-		console.log(weatherRes.data.daily);
 		setWeather(weatherRes.data.daily);
 	};
 
@@ -78,60 +77,50 @@ const App = () => {
 				showsHorizontalScrollIndicator={false}
 			>
 				{weather.length !== 0 ? (
-					weather.map((day, index) => (
-						<View key={index} style={styles.weatherInner}>
-							<View style={styles.day}>
-								<Text style={styles.weather}>
-									{day.weather[0].description}{" "}
-									{day.weather[0].id > 800 && day.weather[0].id < 805 && (
+					weather.map((day, index) => {
+						let iconType = "";
+
+						switch (day.weather[0].main) {
+							case "Clouds":
+								iconType = "weather-cloudy";
+								break;
+							case "Rain":
+								iconType = "weather-rainy";
+								break;
+							case "Drizzle":
+								iconType = "weather-rainy";
+								break;
+							case "Snow":
+								iconType = "weather-snowy";
+								break;
+							case "Thunderstorm":
+								iconType = "weather-thunderstorm";
+								break;
+							case "Clear":
+								iconType = "weather-sunny";
+								break;
+							default:
+								iconType = "weather-cloudy";
+								break;
+						}
+						return (
+							<View key={index} style={styles.weatherInner}>
+								<View style={styles.day}>
+									<Text style={styles.weather}>
+										{day.weather[0].description}{" "}
 										<MaterialCommunityIcons
-											name="weather-cloudy"
+											name={iconType}
 											size={24}
 											color="black"
 										/>
-									)}
-									{day.weather[0].id === 800 && (
-										<MaterialCommunityIcons
-											name="weather-sunny"
-											size={24}
-											color="black"
-										/>
-									)}
-									{day.weather[0].id > 700 && day.weather[0].id < 800 && (
-										<MaterialCommunityIcons
-											name="weather-cloudy"
-											size={24}
-											color="black"
-										/>
-									)}
-									{day.weather[0].id >= 600 && day.weather[0].id < 700 && (
-										<MaterialCommunityIcons
-											name="weather-snowy"
-											size={24}
-											color="black"
-										/>
-									)}
-									{day.weather[0].id >= 300 && day.weather[0].id < 600 && (
-										<MaterialCommunityIcons
-											name="weather-rainy"
-											size={24}
-											color="black"
-										/>
-									)}
-									{day.weather[0].id >= 200 && day.weather[0].id < 300 && (
-										<MaterialCommunityIcons
-											name="weather-thunderstorm"
-											size={24}
-											color="black"
-										/>
-									)}
-								</Text>
+									</Text>
+								</View>
+								<View style={styles.tempBox}>
+									<Text style={styles.temp}>{Math.round(day.temp.day)}°</Text>
+								</View>
 							</View>
-							<View style={styles.tempBox}>
-								<Text style={styles.temp}>{Math.round(day.temp.day)}°</Text>
-							</View>
-						</View>
-					))
+						);
+					})
 				) : (
 					<View style={styles.weatherInner}>
 						<ActivityIndicator size="large" color="#0000ff" />
