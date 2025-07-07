@@ -16,6 +16,31 @@ import axios from "axios";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
+const useRegDate = () => {
+	const [currDate, setCurrDate] = useState(null);
+
+	useEffect(() => {
+		const date = new Date();
+		let month = date.getMonth() + 1;
+		let day = date.getDate();
+		let dayOfWeek = date.getDay();
+		let dayOfWeekString = ["일", "월", "화", "수", "목", "금", "토"];
+
+		let hours = date.getHours();
+		let minutes = date.getMinutes();
+
+		let ampm = hours >= 12 ? "PM" : "AM";
+		hours = hours % 12 || 12;
+
+		minutes = minutes < 10 ? `0${minutes}` : minutes;
+
+		let dateString = `${month}월 ${day}일 ${dayOfWeekString[dayOfWeek]}요일 ${hours}:${minutes} ${ampm}`;
+		setCurrDate(dateString);
+	}, []);
+
+	return currDate;
+};
+
 // https://www.googleapis.com/geolocation/v1/geolocate?key=
 const App = () => {
 	const [location, setLocation] = useState(null);
@@ -23,6 +48,7 @@ const App = () => {
 
 	const [city, setCity] = useState(null);
 	const [weather, setWeather] = useState([]);
+	const currDate = useRegDate();
 
 	const [permitted, setPermitted] = useState(true);
 
@@ -62,13 +88,14 @@ const App = () => {
 	useEffect(() => {
 		locationData();
 	}, []);
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.cityBox}>
 				<Text style={styles.city}>{city}</Text>
 			</View>
 			<View style={styles.dateBox}>
-				<Text style={styles.date}>june</Text>
+				<Text style={styles.date}>{currDate}</Text>
 			</View>
 			<ScrollView
 				pagingEnabled
