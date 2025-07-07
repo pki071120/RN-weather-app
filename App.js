@@ -18,6 +18,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 const useRegDate = () => {
 	const [currDate, setCurrDate] = useState(null);
+	const [dateString, setDateString] = useState(null);
 
 	useEffect(() => {
 		const date = new Date();
@@ -34,11 +35,21 @@ const useRegDate = () => {
 
 		minutes = minutes < 10 ? `0${minutes}` : minutes;
 
-		let dateString = `${month}월 ${day}일 ${dayOfWeekString[dayOfWeek]}요일 ${hours}:${minutes} ${ampm}`;
-		setCurrDate(dateString);
+		setDateString(
+			`${month}월 ${day}일 ${dayOfWeekString[dayOfWeek]}요일 ${hours}:${minutes} ${ampm}`
+		);
+		setCurrDate({
+			month,
+			day,
+			dayOfWeek,
+			dayOfWeekString,
+			hours,
+			minutes,
+			ampm,
+		});
 	}, []);
 
-	return currDate;
+	return { dateString, currDate };
 };
 
 // https://www.googleapis.com/geolocation/v1/geolocate?key=
@@ -48,7 +59,7 @@ const App = () => {
 
 	const [city, setCity] = useState(null);
 	const [weather, setWeather] = useState([]);
-	const currDate = useRegDate();
+	const { dateString, currDate } = useRegDate();
 
 	const [permitted, setPermitted] = useState(true);
 
@@ -106,13 +117,15 @@ const App = () => {
 		locationData();
 	}, []);
 
+	console.log(currDate);
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.cityCon}>
 				<Text style={styles.city}>{city}</Text>
 			</View>
 			<View style={styles.dateCon}>
-				<Text style={styles.date}>{currDate}</Text>
+				<Text style={styles.date}>{dateString}</Text>
 			</View>
 			<ScrollView
 				pagingEnabled
@@ -138,7 +151,10 @@ const App = () => {
 									<Text style={styles.temp}>{Math.round(day.temp.day)}°</Text>
 								</View>
 								<View style={styles.forecastCon}>
-									<Text style={styles.forecastTitle}>Week Forecast</Text>
+									<View style={styles.forecastTextBox}>
+										<Text style={styles.forecastTitle}>Week Forecast</Text>
+										<Text style={styles.forecastDate}>{currDate.day}th</Text>
+									</View>
 									<View style={styles.forecastInfo}></View>
 								</View>
 							</View>
@@ -217,10 +233,23 @@ const styles = StyleSheet.create({
 		flex: 0.6,
 		alignItems: "center",
 	},
+	forecastTextBox: {
+		width: "80%",
+		flexDirection: "row",
+		alignItems: "center",
+	},
 	forecastTitle: {
 		fontSize: 25,
 		fontWeight: "bold",
-		width: "80%",
+	},
+	forecastDate: {
+		fontSize: 15,
+		fontWeight: "bold",
+		flex: 1,
+		height: "100%",
+		textAlign: "right",
+		paddingTop: 10,
+		paddingRight: 10,
 	},
 	forecastInfo: {
 		flex: 0.6,
