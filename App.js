@@ -9,7 +9,7 @@ import {
 	ActivityIndicator,
 } from "react-native";
 import { WEATHER_API_KEY, LOCATION_API_KEY } from "@env";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { MaterialCommunityIcons, Feather, Ionicons } from "@expo/vector-icons";
 
 import * as Location from "expo-location";
 import axios from "axios";
@@ -18,8 +18,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 const useRegDate = () => {
 	const [currDate, setCurrDate] = useState(null);
-	const [dateString, setDateString] = useState(null);
-
+	const [forecastDay, setForecastDay] = useState(null);
 	useEffect(() => {
 		const date = new Date();
 		let month = date.getMonth() + 1;
@@ -34,22 +33,19 @@ const useRegDate = () => {
 		hours = hours % 12 || 12;
 
 		minutes = minutes < 10 ? `0${minutes}` : minutes;
+		let dateString = `${month}월 ${day}일 ${dayOfWeekString[dayOfWeek]}요일 ${hours}:${minutes} ${ampm}`;
 
-		setDateString(
-			`${month}월 ${day}일 ${dayOfWeekString[dayOfWeek]}요일 ${hours}:${minutes} ${ampm}`
-		);
-		setCurrDate({
-			month,
-			day,
-			dayOfWeek,
-			dayOfWeekString,
-			hours,
-			minutes,
-			ampm,
-		});
+		setCurrDate(dateString);
+		day === 1
+			? setForecastDay(day + "st")
+			: day === 2
+				? setForecastDay(day + "nd")
+				: day === 3
+					? setForecastDay(day + "rd")
+					: setForecastDay(day + "th");
 	}, []);
 
-	return { dateString, currDate };
+	return { currDate, forecastDay };
 };
 
 // https://www.googleapis.com/geolocation/v1/geolocate?key=
@@ -59,7 +55,7 @@ const App = () => {
 
 	const [city, setCity] = useState(null);
 	const [weather, setWeather] = useState([]);
-	const { dateString, currDate } = useRegDate();
+	const { currDate, forecastDay } = useRegDate();
 
 	const [permitted, setPermitted] = useState(true);
 
@@ -117,15 +113,13 @@ const App = () => {
 		locationData();
 	}, []);
 
-	console.log(currDate);
-
 	return (
 		<View style={styles.container}>
 			<View style={styles.cityCon}>
 				<Text style={styles.city}>{city}</Text>
 			</View>
 			<View style={styles.dateCon}>
-				<Text style={styles.date}>{dateString}</Text>
+				<Text style={styles.date}>{currDate}</Text>
 			</View>
 			<ScrollView
 				pagingEnabled
@@ -153,9 +147,49 @@ const App = () => {
 								<View style={styles.forecastCon}>
 									<View style={styles.forecastTextBox}>
 										<Text style={styles.forecastTitle}>Week Forecast</Text>
-										<Text style={styles.forecastDate}>{currDate.day}th</Text>
+										<Text style={styles.forecastDate}>{forecastDay}</Text>
 									</View>
-									<View style={styles.forecastInfo}></View>
+									<View style={styles.forecastInfo}>
+										<View style={styles.forecastItem}>
+											<Feather name="wind" size={40} color="white" />
+											<Text
+												style={{ fontSize: 20, paddingTop: 10, color: "white" }}
+											>
+												{parseFloat(day.wind_speed).toFixed(0)}km/h
+											</Text>
+											<Text
+												style={{ fontSize: 16, paddingTop: 10, color: "white" }}
+											>
+												풍속
+											</Text>
+										</View>
+										<View style={styles.forecastItem}>
+											<Ionicons name="water-outline" size={40} color="white" />
+											<Text
+												style={{ fontSize: 20, paddingTop: 10, color: "white" }}
+											>
+												30%
+											</Text>
+											<Text
+												style={{ fontSize: 16, paddingTop: 10, color: "white" }}
+											>
+												강수확률
+											</Text>
+										</View>
+										<View style={styles.forecastItem}>
+											<Feather name="eye" size={40} color="white" />
+											<Text
+												style={{ fontSize: 20, paddingTop: 10, color: "white" }}
+											>
+												1.5km/h
+											</Text>
+											<Text
+												style={{ fontSize: 16, paddingTop: 10, color: "white" }}
+											>
+												시야
+											</Text>
+										</View>
+									</View>
 								</View>
 							</View>
 						);
@@ -253,11 +287,20 @@ const styles = StyleSheet.create({
 	},
 	forecastInfo: {
 		flex: 0.6,
-		backgroundColor: "pink",
+		backgroundColor: "black",
+		flexDirection: "row",
 		width: "80%",
 		borderRadius: 10,
 		marginTop: 10,
+		justifyContent: "center",
 	},
+	forecastItem: {
+		width: "30%",
+		borderWidth: 2,
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	forecastItemText: {},
 });
 
 export default App;
