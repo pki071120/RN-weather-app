@@ -78,11 +78,28 @@ const App = () => {
 		const locationRes = await axios.get(locationApiUrl);
 		const cityName =
 			locationRes.data.results[5].address_components[0].long_name;
-		setCity(cityName);
 
 		const weatherApiUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&exclude=alerts&appid=${WEATHER_API_KEY}&units=metric&lang=kr`;
 		const weatherRes = await axios.get(weatherApiUrl);
+		console.log(weatherRes);
+
+		setCity(cityName);
 		setWeather(weatherRes.data.daily);
+	};
+
+	const weatherDes = (day) => {
+		const weatherIconMap = {
+			Clouds: "weather-cloudy",
+			Rain: "weather-rainy",
+			Drizzle: "weather-rainy",
+			Snow: "weather-snowy",
+			Thunderstorm: "weather-thunderstorm",
+			Clear: "weather-sunny",
+		};
+
+		const iconType = weatherIconMap[day.weather[0].main] || "weather-cloudy";
+
+		return iconType;
 	};
 
 	useEffect(() => {
@@ -91,10 +108,10 @@ const App = () => {
 
 	return (
 		<View style={styles.container}>
-			<View style={styles.cityBox}>
+			<View style={styles.cityCon}>
 				<Text style={styles.city}>{city}</Text>
 			</View>
-			<View style={styles.dateBox}>
+			<View style={styles.dateCon}>
 				<Text style={styles.date}>{currDate}</Text>
 			</View>
 			<ScrollView
@@ -105,51 +122,30 @@ const App = () => {
 			>
 				{weather.length !== 0 ? (
 					weather.map((day, index) => {
-						let iconType = "";
-
-						switch (day.weather[0].main) {
-							case "Clouds":
-								iconType = "weather-cloudy";
-								break;
-							case "Rain":
-								iconType = "weather-rainy";
-								break;
-							case "Drizzle":
-								iconType = "weather-rainy";
-								break;
-							case "Snow":
-								iconType = "weather-snowy";
-								break;
-							case "Thunderstorm":
-								iconType = "weather-thunderstorm";
-								break;
-							case "Clear":
-								iconType = "weather-sunny";
-								break;
-							default:
-								iconType = "weather-cloudy";
-								break;
-						}
 						return (
-							<View key={index} style={styles.weatherInner}>
+							<View key={index} style={styles.weatherCon}>
 								<View style={styles.day}>
 									<Text style={styles.weather}>
 										{day.weather[0].description}{" "}
 										<MaterialCommunityIcons
-											name={iconType}
+											name={weatherDes(day)}
 											size={24}
 											color="black"
 										/>
 									</Text>
 								</View>
-								<View style={styles.tempBox}>
+								<View style={styles.tempCon}>
 									<Text style={styles.temp}>{Math.round(day.temp.day)}°</Text>
+								</View>
+								<View style={styles.forecastCon}>
+									<Text style={styles.forecastTitle}>Week Forecast</Text>
+									<View style={styles.forecastInfo}></View>
 								</View>
 							</View>
 						);
 					})
 				) : (
-					<View style={styles.weatherInner}>
+					<View style={styles.weatherCon}>
 						<ActivityIndicator size="large" color="#0000ff" />
 					</View>
 				)}
@@ -165,7 +161,7 @@ const styles = StyleSheet.create({
 		backgroundColor: "#ffe01a",
 	},
 
-	cityBox: {
+	cityCon: {
 		flex: 0.3,
 	},
 	city: {
@@ -177,7 +173,7 @@ const styles = StyleSheet.create({
 		fontWeight: "bold",
 	},
 
-	dateBox: {
+	dateCon: {
 		alignItems: "center",
 	},
 	date: {
@@ -191,9 +187,7 @@ const styles = StyleSheet.create({
 		borderRadius: 20,
 		overflow: "hidden",
 	},
-
-	weatherRoot: {},
-	weatherInner: {
+	weatherCon: {
 		flex: 3,
 		width: SCREEN_WIDTH,
 	},
@@ -209,7 +203,7 @@ const styles = StyleSheet.create({
 		fontWeight: "bold",
 	},
 
-	tempBox: {
+	tempCon: {
 		flex: 0.5,
 		textAlign: "center",
 		alignItems: "center",
@@ -217,6 +211,23 @@ const styles = StyleSheet.create({
 	},
 	temp: {
 		fontSize: 160,
+	},
+
+	forecastCon: {
+		flex: 0.6,
+		alignItems: "center",
+	},
+	forecastTitle: {
+		fontSize: 25,
+		fontWeight: "bold",
+		width: "80%",
+	},
+	forecastInfo: {
+		flex: 0.6,
+		backgroundColor: "pink",
+		width: "80%",
+		borderRadius: 10,
+		marginTop: 10,
 	},
 });
 
