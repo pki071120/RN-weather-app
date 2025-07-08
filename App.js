@@ -84,11 +84,10 @@ const App = () => {
 		const locationApiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${LOCATION_API_KEY}`;
 		const locationRes = await axios.get(locationApiUrl);
 		const cityName =
-			locationRes.data.results[5].address_components[0].long_name;
+			locationRes.data.results[4].address_components[0].long_name;
 
 		const weatherApiUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&exclude=alerts&appid=${WEATHER_API_KEY}&units=metric&lang=kr`;
 		const weatherRes = await axios.get(weatherApiUrl);
-		console.log(weatherRes);
 
 		setCity(cityName);
 		setWeather(weatherRes.data.daily);
@@ -168,7 +167,7 @@ const App = () => {
 											<Text
 												style={{ fontSize: 20, paddingTop: 10, color: "white" }}
 											>
-												30%
+												{parseFloat(day.pop).toFixed(0)}%
 											</Text>
 											<Text
 												style={{ fontSize: 16, paddingTop: 10, color: "white" }}
@@ -177,16 +176,20 @@ const App = () => {
 											</Text>
 										</View>
 										<View style={styles.forecastItem}>
-											<Feather name="eye" size={40} color="white" />
+											<MaterialCommunityIcons
+												name="sun-wireless-outline"
+												size={40}
+												color="white"
+											/>
 											<Text
 												style={{ fontSize: 20, paddingTop: 10, color: "white" }}
 											>
-												1.5km/h
+												{parseFloat(day.uvi).toFixed(0)}UV
 											</Text>
 											<Text
 												style={{ fontSize: 16, paddingTop: 10, color: "white" }}
 											>
-												시야
+												자외선
 											</Text>
 										</View>
 									</View>
