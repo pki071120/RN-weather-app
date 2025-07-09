@@ -9,48 +9,16 @@ import {
 	ActivityIndicator,
 } from "react-native";
 import { WEATHER_API_KEY, LOCATION_API_KEY } from "@env";
-import { MaterialCommunityIcons, Feather, Ionicons } from "@expo/vector-icons";
+import { Weather, Forecast } from "./components";
 
 import * as Location from "expo-location";
 import axios from "axios";
+import { useRegDate } from "./hooks/useRegDate";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
-const useRegDate = () => {
-	const [currDate, setCurrDate] = useState(null);
-	const [forecastDay, setForecastDay] = useState(null);
-	useEffect(() => {
-		const date = new Date();
-		let month = date.getMonth() + 1;
-		let day = date.getDate();
-		let dayOfWeek = date.getDay();
-		let dayOfWeekString = ["일", "월", "화", "수", "목", "금", "토"];
-
-		let hours = date.getHours();
-		let minutes = date.getMinutes();
-
-		let ampm = hours >= 12 ? "PM" : "AM";
-		hours = hours % 12 || 12;
-
-		minutes = minutes < 10 ? `0${minutes}` : minutes;
-		let dateString = `${month}월 ${day}일 ${dayOfWeekString[dayOfWeek]}요일 ${hours}:${minutes} ${ampm}`;
-
-		setCurrDate(dateString);
-		day === 1
-			? setForecastDay(day + "st")
-			: day === 2
-				? setForecastDay(day + "nd")
-				: day === 3
-					? setForecastDay(day + "rd")
-					: setForecastDay(day + "th");
-	}, []);
-
-	return { currDate, forecastDay };
-};
-
 // https://www.googleapis.com/geolocation/v1/geolocate?key=
 const App = () => {
-	const [location, setLocation] = useState(null);
 	const [errorMsg, setErrorMsg] = useState(null);
 
 	const [city, setCity] = useState(null);
@@ -71,15 +39,6 @@ const App = () => {
 		const {
 			coords: { latitude, longitude },
 		} = await Location.getCurrentPositionAsync({ accuracy: 5 });
-
-		// const address = await Location.reverseGeocodeAsync(
-		// 	{ latitude, longitude },
-		// 	{ useGoogleMaps: false }
-		// );
-		// console.log(address[0].region);
-		// const cityName =
-		// 	address[0].city || address[0].region || address[0].district;
-		// setCity(cityName);
 
 		const locationApiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${LOCATION_API_KEY}`;
 		const locationRes = await axios.get(locationApiUrl);
@@ -127,76 +86,12 @@ const App = () => {
 				showsHorizontalScrollIndicator={false}
 			>
 				{weather.length !== 0 ? (
-					weather.map((day, index) => {
-						return (
-							<View key={index} style={styles.weatherCon}>
-								<View style={styles.day}>
-									<Text style={styles.weather}>
-										{day.weather[0].description}{" "}
-										<MaterialCommunityIcons
-											name={weatherDes(day)}
-											size={24}
-											color="black"
-										/>
-									</Text>
-								</View>
-								<View style={styles.tempCon}>
-									<Text style={styles.temp}>{Math.round(day.temp.day)}°</Text>
-								</View>
-								<View style={styles.forecastCon}>
-									<View style={styles.forecastTextBox}>
-										<Text style={styles.forecastTitle}>Week Forecast</Text>
-										<Text style={styles.forecastDate}>{forecastDay}</Text>
-									</View>
-									<View style={styles.forecastInfo}>
-										<View style={styles.forecastItem}>
-											<Feather name="wind" size={40} color="white" />
-											<Text
-												style={{ fontSize: 20, paddingTop: 10, color: "white" }}
-											>
-												{parseFloat(day.wind_speed).toFixed(0)}km/h
-											</Text>
-											<Text
-												style={{ fontSize: 16, paddingTop: 10, color: "white" }}
-											>
-												풍속
-											</Text>
-										</View>
-										<View style={styles.forecastItem}>
-											<Ionicons name="water-outline" size={40} color="white" />
-											<Text
-												style={{ fontSize: 20, paddingTop: 10, color: "white" }}
-											>
-												{parseFloat(day.pop).toFixed(0)}%
-											</Text>
-											<Text
-												style={{ fontSize: 16, paddingTop: 10, color: "white" }}
-											>
-												강수확률
-											</Text>
-										</View>
-										<View style={styles.forecastItem}>
-											<MaterialCommunityIcons
-												name="sun-wireless-outline"
-												size={40}
-												color="white"
-											/>
-											<Text
-												style={{ fontSize: 20, paddingTop: 10, color: "white" }}
-											>
-												{parseFloat(day.uvi).toFixed(0)}UV
-											</Text>
-											<Text
-												style={{ fontSize: 16, paddingTop: 10, color: "white" }}
-											>
-												자외선
-											</Text>
-										</View>
-									</View>
-								</View>
-							</View>
-						);
-					})
+					weather.map((day, index) => (
+						<View key={index} style={styles.weatherCon}>
+							<Weather day={day} />
+							<Forecast day={day} forecastDay={forecastDay} />
+						</View>
+					))
 				) : (
 					<View style={styles.weatherCon}>
 						<ActivityIndicator size="large" color="#0000ff" />
@@ -244,66 +139,6 @@ const styles = StyleSheet.create({
 		flex: 3,
 		width: SCREEN_WIDTH,
 	},
-	day: {
-		flex: 0.1,
-		textAlign: "center",
-		alignItems: "center",
-	},
-	weather: {
-		flex: 1.5,
-		marginTop: 20,
-		fontSize: 25,
-		fontWeight: "bold",
-	},
-
-	tempCon: {
-		flex: 0.5,
-		textAlign: "center",
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	temp: {
-		fontSize: 160,
-	},
-
-	forecastCon: {
-		flex: 0.6,
-		alignItems: "center",
-	},
-	forecastTextBox: {
-		width: "80%",
-		flexDirection: "row",
-		alignItems: "center",
-	},
-	forecastTitle: {
-		fontSize: 25,
-		fontWeight: "bold",
-	},
-	forecastDate: {
-		fontSize: 15,
-		fontWeight: "bold",
-		flex: 1,
-		height: "100%",
-		textAlign: "right",
-		paddingTop: 10,
-		paddingRight: 10,
-	},
-	forecastInfo: {
-		flex: 0.6,
-		backgroundColor: "black",
-		flexDirection: "row",
-		width: "80%",
-		borderRadius: 10,
-		marginTop: 10,
-		justifyContent: "center",
-	},
-	forecastItem: {
-		width: "30%",
-		borderWidth: 2,
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	forecastItemText: {},
 });
 
 export default App;
